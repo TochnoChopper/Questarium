@@ -1,42 +1,61 @@
 #pragma once
 #include <string>
+#include <iostream>
 #include "Weapons.h"
+#include "Player.h"
 
 using namespace std;
 
 class enemy {
+    friend class player;
+    friend class rogue;
+protected:
+    string enemy_type, weapon_name_e = "Have no weapon!";
+    int health_e;
+    unsigned int damage_e, attack_speed, drop_money_count;
+    unsigned short ability_count_e;
 public:
-    string enemy_type, weapon_name_e;
-    int health_e, drop_money_count;
-    unsigned int final_damage_e;
-
+    void Enemy_get_info() {
+        cout << "\nType: " << enemy_type << " \nHealth: " << health_e << "\nDrop money: " << drop_money_count << " \nWeapon name: " << weapon_name_e << "\nDamage: " << damage_e << "\nAttack speed: " << attack_speed;
+    }
 };
 
 class demon : public enemy {
-protected:
-    string demon_type;
-};
-
-class red_demon : public demon, public sword {
 public:
-    red_demon() {
-        enemy_type = "Demon";
-        demon_type = "Red";
-        weapon_name_e = name_w;
-        health_e = 250;
-        drop_money_count = 100;
-    }
-
-};
-
-class green_demon : public demon, public bow {
-public:
-    green_demon() {
-        enemy_type = "Demon";
-        demon_type = "Green";
-        weapon_name_e = name_w;
-        health_e = 130;
+    demon() {
+        enemy_type = "demon";
+        health_e = 170;
+        damage_e = 38;
+        attack_speed = 15;
         drop_money_count = 40;
+        ability_count_e = 2;
     }
 
+    void Filth_healing() {
+        if (ability_count_e != 0) {
+            health_e += 50;
+            ability_count_e -= 1;
+        }
+        else cout << "Cant use ability\n";
+    }
 };
+
+class goblin : public enemy {
+public:
+    goblin() {
+        enemy_type = "goblin";
+        health_e = 130;
+        damage_e = 38;
+        attack_speed = 15;
+        drop_money_count = 15;
+        ability_count_e = 1;
+    }
+
+    void Increased_damage() {
+        if (ability_count_e != 0) {
+            damage_e += 20;
+            ability_count_e -= 1;
+        }
+        else cout << "Cant use ability\n";
+    }
+}; 
