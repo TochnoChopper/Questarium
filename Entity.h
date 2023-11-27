@@ -16,4 +16,8 @@ public:
         type_e = type;
         this->is_alive = is_alive;
     }
+
+    void Get_info() { 
+        cout << "Entity type: " << type_e << "\nName: " << name_e << "\nAlive: " << is_alive;
+    }
 };
