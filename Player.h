@@ -2,212 +2,242 @@
 #include <string>
 #include "Weapons.h"
 #include "Enemy.h"
+#include "Quest.h"
+#include "Entity.h"
 
 using namespace std;
 
 class player {
+    friend class enemy;
+protected:
+    unsigned int id, damage_p = 0, attack_speed_p = 0;
+    unsigned short magic_lvl, ability_limit;
+    int health_p;
+    string player_name, weapon_name = "No weapon!\n", available_weapon;
 public:
-    unsigned int id;
-    int health;
-    string player_name, weapon_name;
+    void Swap_weapon(weapon w) {
+        if (available_weapon == w.type_w) {
+            damage_p = w.damage_w;
+            attack_speed_p = w.attack_speed;
+            weapon_name = w.name_w;
+        }
+
+        else cout << "Player cant use this weapon\n";
+    }
+
+    void Player_get_info() {
+        cout << "\nid: " << id << "\nName: " << player_name << "\nHealth: " << health_p << "\nWeapon name: " << weapon_name << "\nDamage: " << damage_p << "\nAttack speed:" << attack_speed_p << endl;
+    }
+
+    void Player_attack(enemy &d) {
+        d.health_e -= damage_p;
+    }
+
+    void Talk_NPC(NPC np) {
+        cout << "Quest " << np.number_giving_quest << "... " << np.name_giving_quest << endl;
+        cout << np.begining_talk << endl << np.descript_giving_quest << endl;
+    }
+
+    void Cut_tree(entity e) {
+        if ((e.type_e == "tree") || (e.is_alive = true)) {
+            cout << player_name << " is cutting " << e.name_e << endl;
+            e.is_alive = false;
+        }
+        else cout << "This is not tree or it was already cut\n";
+    }
 };
 
-class warrior : public player, public sword {
+class warrior : public player{
 public:
     warrior(unsigned int id, string name, int health) {
-        weapon_name = name_w;
         this->id = id;
         player_name = name;
-        this->health = health;
+        this->health_p = health;
+        available_weapon = "sword";
+        magic_lvl = 0;
+        ability_limit = 1;
     }
-    void Warior_attack_RD(red_demon& d) { // *
-        d.health_e -= final_damage;
-    }
-    void Warior_attack_GD(green_demon& d) {
-        d.health_e -= final_damage;
-    }
-    void Warrior_get_info() {
-        cout << "id: " << id << "; Name: " << player_name << "; Health: " << health << "; Damage: " << final_damage << "; Weapon name: " << name_w << endl;
+
+    void Warrior_furios() {
+        if (ability_limit != 0) {
+            damage_p += 30;
+            health_p -= 30;
+            ability_limit -= 1;
+        }
+        else cout << "Impossible to use ability!";;
     }
 };
 
-class ranger : public player, public bow {
+class ranger : public player{
 public:
     ranger(unsigned int id, string name, int health) {
-        weapon_name = name_w;
         this->id = id;
         player_name = name;
-        this->health = health;
+        this->health_p = health;
+        available_weapon = "bow";
+        magic_lvl = 0;
+        ability_limit = 2;
     }
-    void Ranger_attack_RD(red_demon& d) {
-        d.health_e -= final_damage;
-    }
-    void Ranger_attack_GD(green_demon& d) {
-        d.health_e -= final_damage;
-    }
-    void Ranger_get_info() {
-        cout << "id: " << id << "; Name: " << player_name << "; Health: " << health << "; Damage: " << final_damage << "; Weapon name: " << name_w << endl;
+
+    void Ranger_potion() {
+        if (ability_limit != 0) {
+            health_p += 15;
+            ability_limit -= 1;
+        }
+        else cout << "Impossible to use ability!";;
     }
 };
 
-class rogue : public player, public dagger {
+class rogue : public player{
 public:
     rogue(unsigned int id, string name, int health) {
-        weapon_name = name_w;
         this->id = id;
         player_name = name;
-        this->health = health;
+        this->health_p = health;
+        available_weapon = "dagger";
+        magic_lvl = 0;
+        ability_limit = 2;
     }
-    void Rogue_attack_RD(red_demon& d) {
-        d.health_e -= final_damage;
+    void Throw_dagger(enemy &e) {
+        if (ability_limit != 0) {
+            e.health_e -= 12;
+            ability_limit -= 1;
+        }
+        else cout << "Impossible to use ability!";;
     }
-    void Rogue_attack_GD(green_demon& d) {
-        d.health_e -= final_damage;
-    }
-    void Rogue_get_info() {
-        cout << "id: " << id << "; Name: " << player_name << "; Health: " << health << "; Damage: " << final_damage << "; Weapon name: " << name_w << endl;
-    }
-};
+}; 
 
-class sniper : public player, public sniper_rifle {
+class sniper : public player{
 public:
     sniper(unsigned int id, string name, int health) {
-        weapon_name = name_w;
         this->id = id;
         player_name = name;
-        this->health = health;
-    }
-    void Sniper_attack_RD(red_demon& d) {
-        d.health_e -= final_damage;
-    }
-    void Sniper_attack_GD(green_demon& d) {
-        d.health_e -= final_damage;
-    }
-    void Sniper_get_info() {
-        cout << "id: " << id << "; Name: " << player_name << "; Health: " << health << "; Damage: " << final_damage << "; Weapon name: " << name_w << endl;
+        this->health_p = health;
+        available_weapon = "sniper_rifle";
+        ability_limit = 3;
     }
 };
 
-class blood_mage : public player, protected blood_magic_staff {
+/* Mages */
+
+class blood_mage : public player{
 public:
     blood_mage(unsigned int id, string name, int health) {
-        weapon_name = name_w;
         this->id = id;
         player_name = name;
-        this->health = health;
+        this->health_p = health;
+        available_weapon = "staff";
+        magic_lvl = 0;
+        ability_limit = 1;
     }
+
     void lvl_up(int new_lvl) {
-        lvl = new_lvl;
-        if (lvl == 0) {
-            extra_damage = 0;
-            max_familiars = 0;
+        if (new_lvl <= magic_lvl) cout << "Player cant reduce his lvl or lvl is same!\n";
+        else {
+            magic_lvl = new_lvl;
+
+            if (magic_lvl == 0) {
+                damage_p += 0;
+            }
+            else if (magic_lvl == 1) {
+                damage_p += 13;
+            }
+            else if (magic_lvl == 2) {
+                damage_p += 18;
+            }
+            else if (magic_lvl == 3) {
+                damage_p += 35;
+            }
         }
-        else if (lvl == 1) {
-            extra_damage = 11;
-            max_familiars = 1;
-        }
-        else if (lvl == 2) {
-            extra_damage = 20;
-            max_familiars = 2;
-        }
-        else if (lvl == 3) {
-            extra_damage = 38;
-            max_familiars = 3;
-        }
-        if (lvl == 0) final_damage = 0;
-        else final_damage = 15 + extra_damage;
     }
-    void Blood_mage_attack_RD(red_demon& d) {
-        d.health_e -= final_damage;
-    }
-    void Blood_mage_attack_GD(green_demon& d) {
-        d.health_e -= final_damage;
-    }
-    void Blood_mage_get_info() {
-        cout << "id: " << id << "; Name: " << player_name << "; Health: " << health << "; Damage: " << final_damage << "; Weapon name: " << name_w << "; Magic lvl: " << lvl << endl;
+
+    void Ancient_knowledges() {
+        if (ability_limit != 0) {
+            damage_p += 30;
+            ability_limit -= 1;
+        }
+        else cout << "Impossible to use ability!";;
     }
 };
 
-class arcane_mage : public player, public arcane_magic_staff {
+class arcane_mage : public player{
 public:
     arcane_mage(unsigned int id, string name, int health) {
-        weapon_name = name_w;
         this->id = id;
         player_name = name;
-        this->health = health;
+        this->health_p = health;
+        available_weapon = "staff";
+        magic_lvl = 0;
+        ability_limit = 1;
     }
     void lvl_up(int new_lvl) {
-        lvl = new_lvl;
+        if (new_lvl <= magic_lvl) cout << "Player cant reduce his lvl or lvl is same!\n";
+        else {
+            magic_lvl = new_lvl;
 
-        if (lvl == 0) {
-            extra_damage = 0;
-            shield_capacity = 0;
+            if (magic_lvl == 0) {
+                damage_p += 0;
+            }
+            else if (magic_lvl == 1) {
+                damage_p += 10;
+            }
+            else if (magic_lvl == 2) {
+                damage_p += 15;
+            }
+            else if (magic_lvl == 3) {
+                damage_p += 27;
+            }
         }
-        else if (lvl == 1) {
-            extra_damage = 9;
-            shield_capacity = 40;
-        }
-        else if (lvl == 2) {
-            extra_damage = 23;
-            shield_capacity = 65;
-        }
-        else if (lvl == 3) {
-            extra_damage = 47;
-            shield_capacity = 90;
+    }
 
-        if (lvl == 0) final_damage = 0;
-        else final_damage = 15 + extra_damage;
+    void Arcane_shield() {
+        if (ability_limit != 0) {
+            health_p += 100;
+            ability_limit -= 1;
         }
-    }
-    void Arcane_mage_attack_RD(red_demon& d) {
-        d.health_e -= final_damage;
-    }
-    void Arcane_mage_attack_GD(green_demon& d) {
-        d.health_e -= final_damage;
-    }
-    void Arcane_mage_get_info() {
-        cout << "id: " << id << "; Name: " << player_name << "; Health: " << health << "; Damage: " << final_damage << "; Weapon name: " << name_w << "; Magic lvl: " << lvl << endl;
+        else cout << "Impossible to use ability!";;
     }
 };
 
-class ice_mage : public player, public ice_magic_staff {
+class ice_mage : public player{
+protected:
+    unsigned int saved_damage;
 public:
     ice_mage(unsigned int id, string name, int health) {
-        weapon_name = name_w;
         this->id = id;
         player_name = name;
-        this->health = health;
+        this->health_p = health;
+        available_weapon = "staff";
+        magic_lvl = 0;
+        ability_limit = 1;
     }
     void lvl_up(int new_lvl) {
-        lvl = new_lvl;
+        if (new_lvl <= magic_lvl) cout << "Player cant reduce his lvl!\n";
+        else {
+            magic_lvl = new_lvl;
 
-        if (lvl == 0) {
-            extra_damage = 0;
-            lump_duration = 0.0f;
+            if (magic_lvl == 0) {
+                damage_p += 0;
+            }
+            else if (magic_lvl == 1) {
+                damage_p += 9;
+            }
+            else if (magic_lvl == 2) {
+                damage_p += 19;
+            }
+            else if (magic_lvl == 3) {
+                damage_p += 30;
+            }
         }
-        else if (lvl == 1) {
-            extra_damage = 12;
-            lump_duration = 2.0f;
-        }
-        else if (lvl == 2) {
-            extra_damage = 21;
-            lump_duration = 3.5f;
-        }
-        else if (lvl == 3) {
-            extra_damage = 39;
-            lump_duration = 5.0f;
-        }
+    }
 
-        if (lvl == 0) final_damage = 0;
-        else final_damage = 15 + extra_damage;
+    void Water_lung_on() {
+        saved_damage = damage_p;
+        damage_p = 0;
+        health_p += 5000;
     }
-    void Ice_mage_attack_RD(red_demon& d) {
-        d.health_e -= final_damage;
-    }
-    void Ice_mage_attack_GD(green_demon& d) {
-        d.health_e -= final_damage;
-    }
-    void Ice_mage_get_info() {
-        cout << "id: " << id << "; Name: " << player_name << "; Health: " << health << "; Damage: " << final_damage << "; Weapon name: " << name_w << "; Magic lvl: " << lvl << endl;
+    void Water_lung_off() {
+        damage_p = saved_damage;
+        health_p -= 5000;
     }
 };
